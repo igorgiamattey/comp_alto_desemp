@@ -95,5 +95,64 @@ OpenMP
 		# `depend(out: x)` indica que uma tarefa gera o resultado (source).
     	# `depend(in: x)` indica que uma tarefa posterior precisa aguardar esse valor (sink).
 
-12. Algoritmo Prefix Sum
-	- Algoritmo de soma acumulada que pode ser paralelizado para melhorar desempenho em grandes volumes de dados.
+12. Sections (Paralelismo de Tarefas Distintas)
+
+	A diretiva #pragma omp sections permite que você divida o trabalho em blocos de código independentes. O OpenMP garante que cada bloco (seção) seja executado exatamente uma vez por uma única thread da equipe.
+
+		A Analogia da Cozinha:
+
+			parallel for: Você tem 100 cebolas para picar e 4 cozinheiros. Todos os 4 cozinheiros pegam facas e picam cebolas juntos (mesma tarefa, dados divididos).
+
+			sections: O cliente pediu um prato complexo. Um cozinheiro grelha a carne, outro frita a batata e um terceiro prepara a salada. (Tarefas diferentes executadas simultaneamente).
+
+		Sections vs Tasks (Qual usar?)
+
+			Você viu as tasks no exemplo da lista encadeada (linked list) anteriormente. Ambas servem para paralelismo de tarefas, mas:
+
+				Use sections quando você tem um número fixo, pequeno e bem conhecido de tarefas independentes que você já sabe exatamente quais são antes de rodar o código (ex: Inicializar 4 módulos diferentes de um sistema). É estático.
+
+				Use tasks quando você tem um número desconhecido de tarefas geradas dinamicamente durante a execução (ex: percorrer uma lista encadeada, algoritmos recursivos como o Quicksort).
+
+13. Paralelismo Aninhado (Nested Parallelism)
+
+	Ocorre quando uma thread que já está executando dentro de uma região paralela encontra uma nova diretiva #pragma omp parallel.
+
+		A Analogia da Subcontratação:
+		Imagine que você é o gerente (Thread Mestre) e contrata 4 mestres de obras (Nível 1). O paralelismo aninhado permite que cada um desses mestres de obras contrate sua própria equipe de 4 pedreiros (Nível 2) para realizar uma subtarefa.
+
+	O Comportamento Padrão (Desativado)
+
+	Por padrão, o OpenMP desativa o paralelismo aninhado por motivos de segurança.
+	Se você colocar um parallel dentro de outro sem avisar o compilador, a thread do nível 1 criará uma "equipe de 1 pessoa" (ela mesma) e executará o bloco interno de forma sequencial.
+
+	Para fazer funcionar de verdade, você precisa ligar essa chave explicitamente no código usando omp_set_nested(1) (ou em versões mais recentes do OpenMP, omp_set_max_active_levels()).
+
+14. Collapse (Achatamento de Loops Aninhados)
+
+	A cláusula collapse(N) é usada junto com o #pragma omp parallel for para transformar (achatar) N loops aninhados em um único loop gigante. Em seguida, o OpenMP divide automaticamente esse novo "super loop" entre as threads disponíveis.
+
+		O Problema que ele resolve: Imagine que você tem uma matriz de 3 x 1000 e um processador de 8 núcleos. Se você colocar um parallel for apenas no loop externo (que vai até 3), apenas 3 threads vão trabalhar e 5 ficarão ociosas. O collapse resolve isso sem precisar de paralelismo aninhado (que causaria explosão de threads).
+
+		A Analogia do Tabuleiro:
+		Em vez de distribuir "linhas inteiras" do tabuleiro para cada pessoa, você transforma o tabuleiro em uma fita longa e contínua de quadradinhos e distribui fatias iguais dessa fita para todos os trabalhadores.
+
+	Como funciona a sintaxe
+
+	Você indica o número de loops que deseja achatar dentro dos parênteses: collapse(2) para achatar dois loops, collapse(3) para três, etc.
+
+	Regra de Ouro (Loops Perfeitamente Aninhados)
+
+	Para que o collapse funcione, os loops precisam ser perfeitamente aninhados. Isso significa que não pode haver nenhuma linha de código (como printf ou inicialização de variáveis que não fazem parte do loop) entre o primeiro for e o segundo for.
+
+		ERRADO:
+		#pragma omp parallel for collapse(2)
+		for (int i = 0; i < 10; i++) {
+			printf("Nova linha\n"); // PROIBIDO: Quebra o aninhamento perfeito!
+			for (int j = 0; j < 10; j++) { ... }
+		}
+
+		CORRETO:
+		#pragma omp parallel for collapse(2)
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) { ... } // Nada entre os 'for's
+		}
