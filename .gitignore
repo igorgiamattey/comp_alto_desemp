@@ -1,4 +1,3 @@
 hpc/
-task.c
-test.c
+test_program/
 a.out

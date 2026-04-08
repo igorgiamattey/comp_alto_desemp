@@ -55,7 +55,7 @@ int main(int argc, char ** argv) {
                     w[i] = w[i] + beta * error * x[i];
                 }
 
-                mse_avg[k] += (error * error);
+                mse_avg_local[k] += (error * error);
             }
 
         }
