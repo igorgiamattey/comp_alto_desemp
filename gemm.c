@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
+#include <time.h>
+
+#ifndef CLOCK_MONOTONIC
+    #define CLOCK_MONOTONIC 1
+#endif
 
 #define IDX(i, j) (i*n + j)
 #define BS 72
@@ -87,6 +92,12 @@ void printm( double * A,  int n ) {
 	printf("\n");
 }
 
+double get_time() {
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return t.tv_sec + t.tv_nsec * 1e-9;
+}
+
 int main(int argc, char ** argv ) {
 	int n = atoi( argv[1] );
 
@@ -100,7 +111,24 @@ int main(int argc, char ** argv ) {
 		}
 	}
 
+	naive_gemm(C, A, B, 2.0, 2.0, n);
+
+	double t0 = omp_get_wtime();
+	naive_gemm(C, A, B, 2.0, 2.0, n);
+	double t1 = omp_get_wtime();
+
+	double t2 = omp_get_wtime();
+	pro_gemm(C, A, B, 2.0, 2.0, n);
+	double t3 = omp_get_wtime();
+	
+	double t4 = omp_get_wtime();
 	pro_gemm_tile( C, A, B, 2.0, 2.0, n );
+	double t5 = omp_get_wtime();
+
+	printf("[NAIVE]: %.6f s\n", t1 - t0);
+	printf("[PRO]: %.6f s\n", t3 - t2);
+	printf("[TILE]: %.6f s\n", t5 - t4);
+
 	//printm( C, n );
 
 	free( A );

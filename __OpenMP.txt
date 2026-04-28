@@ -31,40 +31,41 @@ OpenMP
 	- Private: cada thread tem sua própria cópia não inicializada da variável.
 		# firstprivate: inicializa com valor original
 
-		'''
-		int x = 50
+			'''
+			int x = 50
 
-		#pragma omp parallel firstprivate(x)
-		{
-			int id = omp_get_thread_num();
-			x = x + (id * 10);
-			// aqui temos o valor alterado para cada thread
-			printf("x = %d\n", x); // x = 50 + (10 * id)
-		}
+			#pragma omp parallel firstprivate(x)
+			{
+				int id = omp_get_thread_num();
+				x = x + (id * 10);
+				// aqui temos o valor alterado para cada thread
+				printf("x = %d\n", x); // x = 50 + (10 * id)
+			}
 
-		// aqui teremos o valor original de x, sem nenhuma alteração
-		printf("x = %d\n", x); // x = 50
-		'''
+			// aqui teremos o valor original de x, sem nenhuma alteração
+			printf("x = %d\n", x); // x = 50
+			'''
 
 		# lastprivate: mantém valor final da última iteração
 
-		'''
-		int x = 0;
+			'''
+			int x = 0;
 
-		#pragma omp parallel for lastprivate(x)
-		for (int i = 0; i <= 50; i++) {
+			#pragma omp parallel for lastprivate(x)
+			for (int i = 0; i <= 50; i++) {
+				
+				// aqui x foi inicializado com lixo de memória
+				printf("x = %d\n", x); // x = lixo de memória
+				x = i * 2;
+
+				// aqui x recebe o valor calculado na iteração atual
+				printf("x = %d\n", x); // x = 2*i
+			}
 			
-			// aqui x foi inicializado com lixo de memória
-			printf("x = %d\n", x); // x = lixo de memória
-			x = i * 2;
+			// aqui x recebe o valor calculado na última iteração do loop, não necessariamente na última thread que finalizou, portanto recebe o valor com i = 50
+			printf("x = %d\n", x); // x = 2*50 = 100
+			'''
 
-			// aqui x recebe o valor calculado na iteração atual
-			printf("x = %d\n", x); // x = 2*i
-		}
-		
-		// aqui x recebe o valor calculado na última iteração do loop, não necessariamente na última thread que finalizou, portanto recebe o valor com i = 50
-		printf("x = %d\n", x); // x = 2*50 = 100
-		'''
 	- Shared: A variável é compartilhada entre todas as threads (padrão para variáveis declaradas antes do bloco paralelo). Modificações afetam todas as threads.
 
 6. Controle de Execução

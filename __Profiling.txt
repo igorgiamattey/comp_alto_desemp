@@ -1,0 +1,21 @@
+Analisa o comportamento de execução de um programa
+	- Quantas vezes cada função foi chamada
+	- Quanto cada função consome de tempo
+	- Consumo de memória
+	- Qual função chamou qual
+	* Objetivo: Otimizar o código
+
+	- Flat Profiler: Quanto tempo o programa gasta em cada função?
+	- Call Graph: Qual função chamou qual e quantas vezes?
+	- Code Coverage: Quantas vezes cada linha do código foi executada?
+
+	gprof
+		- Flat Profiler e Call Graph
+		- Compilar -g e -pg
+		- gcc -g -pg <file>
+		- ./a.out <input>
+		- gprof a.out
+
+	* Principio da Localidade Espacial Temporal
+
+	Code Coverage

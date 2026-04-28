@@ -19,7 +19,7 @@ int main (int argc, char ** argv){
 
 	int * prefix = (int *) malloc(4*nt);
 
-	#pragma omp parallel
+	#pragma omp parallel num_threads(nt)
 	{
 		int chunk = n/nt;
 		int tid = omp_get_thread_num();
@@ -35,7 +35,7 @@ int main (int argc, char ** argv){
 		#pragma omp single
 		{
 			prefix[1] = v[chunk - 1];
-			for (int i = 1; i < nt; ++i){
+			for (int i = 2; i < nt; ++i){
 				prefix[i] = prefix[i-1] + v[i * chunk - 1];
 			}
 		}
