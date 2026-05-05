@@ -1,0 +1,31 @@
+MPI (Message Passing Interface)
+
+1. Conceito Geral MPI (Message Passing Interface)
+	é um padrão para computação paralela distribuída.
+	Ele funciona através da troca de mensagens entre processos independentes.
+	- MPICh / OpenMPI: São as implementações mais comuns do padrão.
+	- Sockets: Camada de comunicação utilizada para a troca de dados.
+
+2. Comunicação Coletiva
+	As diretivas de comunicação coletiva envolvem todos os processos de um grupo.
+
+	- Bcast (Broadcast): Um processo manda a mesma informação para todos os outros.
+	- Gather: Coleta dados de todos os processos. Cada processo tem um trecho diferente do vetor e o Gather os reúne no processo raiz.
+	- Scatter: O inverso do Gather. O processo root manda uma parte diferente do vetor para cada um dos outros processos.
+	- AllGather: Similar ao Gather, mas o resultado final é distribuído para todos os processos envolvidos, não apenas para o root.
+	- All to All: Cada processo envia e recebe dados de todos os outros processos.
+
+3. Conceitos Fundamentais (Extras)
+	Diferente do OpenMP (memória compartilhada), o MPI é focado em memória distribuída.
+
+	- Processo: Ao contrário das threads, processos MPI possuem seu próprio espaço de memória isolado.
+	- Rank: Identificador único de cada processo dentro de um comunicador. Geralmente, o Rank 0 é o mestre (root).
+	- Size: Indica o número total de processos alocados para a execução.
+	- MPI_COMM_WORLD: O comunicador padrão que engloba todos os processos iniciados.
+	- MPI_Init & MPI_Finalize: Funções obrigatórias para iniciar e encerrar o ambiente MPI em um programa.
+
+
+4. Sincronização e Operações
+	- Barrier (MPI_Barrier): Todas as instâncias esperam até que todos os processos alcancem este ponto.
+	
+	- Reduction (MPI_Reduce): Coleta dados de todos os processos e aplica uma operação (como soma ou valor máximo), retornando o resultado consolidado.
