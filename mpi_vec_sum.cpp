@@ -1,7 +1,7 @@
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
 #include <mpi.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include "partition.h"
 
@@ -46,7 +46,8 @@ int main (int argc, char ** argv){
 	MPI_Scatterv(
 		const void *sendbuf, const int sendcounts[], const int displs[],
         MPI_Datatype sendtype, void *recvbuf, int recvcount,
-        MPI_Datatype recvtype, int root, MPI_Comm comm)
+        MPI_Datatype recvtype, int root, MPI_Comm comm
+	);
 	*/
 
 
@@ -63,7 +64,19 @@ int main (int argc, char ** argv){
 	);
 
 	vec_sum(r_local, v_local, w_local, p);
-	MPI_Gatherv( r_local, p.chunk(), MPI_DOUBLE, r, p.chunks(), p.displ(), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+	/*
+	MPI_Gatherv(
+		const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+		void *recvbuf, const int recvcounts[], const int displs[],
+		MPI_Datatype recvtype, int root, MPI_Comm comm
+	);
+	*/
+	
+	MPI_Gatherv( r_local, p.chunk(), MPI_DOUBLE,
+		r, p.chunks(), p.displ(),
+		MPI_DOUBLE, 0, MPI_COMM_WORLD
+	);
 
 	if (rank == 0) {		
 		for (int i = 0; i < p.size(); i++) {
