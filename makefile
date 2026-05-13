@@ -1,16 +1,18 @@
 OUTPUT=a.out
 
-RUN_ARGS := $(filter-out run, $(MAKECMDGOALS))
+RUN_ARGS := $(filter-out run-mpi run-omp, $(MAKECMDGOALS))
 
 %:
 	@:
 
 compile-omp:
 	@gcc $(file) -fopenmp -O3
+	@clear
 	@echo "Compiled Successfully!"
 
 compile-mpi:
 	@mpicxx $(file) -O3
+	@clear
 	@echo "Compiled Successfully!"
 
 run-omp:
