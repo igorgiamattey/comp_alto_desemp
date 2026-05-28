@@ -1,0 +1,50 @@
+CUDA (Compute Unified Device Architecture)
+
+1. Conceito Geral CUDA
+	é uma plataforma de computação paralela e um modelo de programação criado pela NVIDIA para uso em suas próprias GPUs.
+	Ela permite que desenvolvedores utilizem o poder de processamento massivo das GPUs para computação de propósito geral (GPGPU), acelerando aplicações científicas, analíticas e de engenharia.
+	Host vs Device:
+		- Host: Refere-se à CPU (Central Processing Unit) e à sua respectiva memória RAM do sistema. É onde o fluxo principal do programa começa.
+		- Device: Refere-se à GPU (Graphics Processing Unit) e à sua memória integrada dedicada (VRAM). É onde o processamento massivamente paralelo acontece.
+
+2. Computação Heterogênea
+	Associada a uma computação que não compartilha a mesma arquitetura entre todos os nós computacionais.
+	No ecossistema CUDA, o código do Host (CPU) gerencia o fluxo de execução, aloca memória no Device, copia os dados da CPU para a GPU, dispara o processamento paralelo e, por fim, traz os resultados de volta para a CPU.
+
+3. O Kernel e o Modelo de Programação
+	O Kernel é uma função especial executada na GPU que é chamada pelo Host e executada N vezes em paralelo por N threads CUDA diferentes.
+	Diretiva `__global__`: Indica ao compilador que a função é um Kernel, o que significa que ela será chamada pela CPU (Host) mas executada na GPU (Device).
+	Exemplo:
+		'''
+		__global__ void VecAdd (float* A, float* B, float* C) {
+			/* Forma sequencial padrão na CPU:
+			for (int i = 0; i < n; i++) {
+				c[i] = a[i] + b[i];
+			}
+			*/
+			
+			/* Forma paralela CUDA na GPU: */
+			int i = threadIdx.x; // Cada thread descobre seu próprio ID
+			C[i] = A[i] + B[i];  // Cada thread processa um elemento do vetor
+		}
+
+		int main () {
+			...
+			// Invocação do Kernel com 1 bloco de N threads
+			VecAdd<<<1, N>>>(A, B, C);
+			...
+		}
+		'''
+
+4. Hierarquia de Execução: Grid e Block
+	A organização das threads em CUDA é estruturada de forma tridimensional para mapear facilmente matrizes e volumes de dados.
+	- Grid: É a estrutura de nível mais alto que representa toda a invocação do Kernel. Um Grid é formado por um conjunto de blocos de threads.
+	- Block (Bloco): É um agrupamento de threads dentro de um Grid. Threads que pertencem ao mesmo bloco podem sincronizar entre si e compartilhar dados de forma extremamente rápida. Não há garantia de sincronismo entre threads de blocos diferentes.
+	Hierarquia estrutural: Um Grid é composto por Blocks, e cada Block é constituído de Threads.
+
+5. Hierarquia de Memória
+	Para maximizar a eficiência de desempenho, CUDA possui diferentes níveis de memória com velocidades e escopos de acesso variados:
+	- Local Memory (Memória Local): Escopo restrito a cada thread individual. É usada automaticamente para variáveis locais que não cabem nos registradores da thread.
+	- Shared Memory (Memória Compartilhada): Espaço de memória de alta velocidade compartilhado por todas as threads que pertencem ao mesmo bloco. É ideal para comunicação rápida entre threads vizinhas.
+	- Global Memory (Memória Global): O maior espaço de memória na GPU, porém com maior latência. É compartilhada e visível por todas as threads de todos os blocos, inclusive por execuções de kernels diferentes.
+	- Constant e Texture Memory: Espaços de memória especializados de hardware que são estritamente Read-Only (Apenas Leitura) para o Device, possuindo caches agressivos para acelerar os acessos.
