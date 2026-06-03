@@ -68,36 +68,36 @@ __global__ void julia_set( double xmin,
 }      
 
 int main() {
-  int width = 1024; 
-  int height = 1024;
-  double xmin = -1.5; 
-  double ymin = -1.5; 
-  double xmax = 1.5;
-  double ymax = 1.5; 
-  int max_iter = 255;
-  double max_abs_z = 64.;
-  complex c( -0.7, 0.27015 );
-  //complex c( 0.6, -1.47015 );
-  
-  unsigned char * h_buf = (unsigned char *) malloc( width * height * 3 );
-  unsigned char * d_buf;
-  cudaMalloc( &d_buf, width * height * 3 );
+	int width = 1024; 
+	int height = 1024;
+	double xmin = -1.5; 
+	double ymin = -1.5; 
+	double xmax = 1.5;
+	double ymax = 1.5; 
+	int max_iter = 255;
+	double max_abs_z = 64.;
+	complex c( -0.7, 0.27015 );
+	//complex c( 0.6, -1.47015 );
+
+	unsigned char * h_buf = (unsigned char *) malloc( width * height * 3 );
+	unsigned char * d_buf;
+	cudaMalloc( &d_buf, width * height * 3 );
 	
 	dim3 threadsPerBlock(32, 32);
 	dim3 blocksPerGrid((height + threadsPerBlock.x -1)/threadsPerBlock.x,(width + threadsPerBlock.y - 1)/threadsPerBlock.y);
-	
+
 	julia_set<<< blocksPerGrid, threadsPerBlock >>>( xmin, 
-			   xmax, 
-			   ymin, 
-			   ymax,
-			   width,
-			   height,
-			   c,
-			   max_iter,
-			   max_abs_z,
-			   d_buf );
+				xmax, 
+				ymin, 
+				ymax,
+				width,
+				height,
+				c,
+				max_iter,
+				max_abs_z,
+				d_buf );
 
 	cudaMemcpy(h_buf, d_buf, width*height*3, cudaMemcpyDeviceToHost);
-	
+
 	int ret = bmp_generator("a.bmp", width, height, h_buf);
 }
