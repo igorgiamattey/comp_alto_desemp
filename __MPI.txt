@@ -1,33 +1,33 @@
 MPI
 
 1. Conceito Geral MPI (Message Passing Interface)
-	é um padrão para computação paralela distribuída[cite: 1].
-	Ele funciona através da troca de mensagens entre processos independentes[cite: 2].
-	- MPICh / OpenMPI: São as implementações mais comuns do padrão[cite: 3].
-	- Sockets: Camada de comunicação utilizada para a troca de dados[cite: 4].
+	é um padrão para computação paralela distribuída.
+	Ele funciona através da troca de mensagens entre processos independentes.
+	- MPICh / OpenMPI: São as implementações mais comuns do padrão.
+	- Sockets: Camada de comunicação utilizada para a troca de dados.
 	Processo vs Thread:
-		- Processo: possui seu próprio espaço de memória isolado[cite: 12]. Processos em nós distintos não compartilham memória[cite: 11, 12].
-		- Thread: unidade leve que compartilha memória dentro de um mesmo processo (modelo do OpenMP)[cite: 11, 22].
+		- Processo: possui seu próprio espaço de memória isolado. Processos em nós distintos não compartilham memória.
+		- Thread: unidade leve que compartilha memória dentro de um mesmo processo (modelo do OpenMP).
 
 2. Conceitos Fundamentais (Extras)
-	Diferente do OpenMP (memória compartilhada), o MPI é focado em memória distribuída[cite: 11].
-	- Processo: Ao contrário das threads, processos MPI possuem seu próprio espaço de memória isolado[cite: 12].
-	- Rank: Identificador único de cada processo dentro de um comunicador[cite: 13]. Geralmente, o Rank 0 é o mestre (root)[cite: 13].
-	- Size: Indica o número total de processos alocados para a execução[cite: 14].
-	- MPI_COMM_WORLD: O comunicador padrão que engloba todos os processos iniciados[cite: 15].
-	- MPI_Init & MPI_Finalize: Funções obrigatórias para iniciar e encerrar o ambiente MPI em um programa[cite: 16].
+	Diferente do OpenMP (memória compartilhada), o MPI é focado em memória distribuída.
+	- Processo: Ao contrário das threads, processos MPI possuem seu próprio espaço de memória isolado.
+	- Rank: Identificador único de cada processo dentro de um comunicador. Geralmente, o Rank 0 é o mestre (root).
+	- Size: Indica o número total de processos alocados para a execução.
+	- MPI_COMM_WORLD: O comunicador padrão que engloba todos os processos iniciados.
+	- MPI_Init & MPI_Finalize: Funções obrigatórias para iniciar e encerrar o ambiente MPI em um programa.
 
 3. Comunicação Coletiva
-	As diretivas de comunicação coletiva envolvem todos os processos de um grupo[cite: 5].
-	- Bcast (Broadcast): Um processo manda a mesma informação para todos os outros[cite: 6].
-	- Gather: Coleta dados de todos os processos[cite: 7]. Cada processo tem um trecho diferente do vetor e o Gather os reúne no processo raiz[cite: 7].
-	- Scatter: O inverso do Gather[cite: 8]. O processo root manda uma parte diferente do vetor para cada um dos outros processos[cite: 8].
-	- AllGather: Similar ao Gather, mas o resultado final é distribuído para todos os processos envolvidos, não apenas para o root[cite: 9].
-	- All to All: Cada processo envia e recebe dados de todos os outros processos[cite: 10].
+	As diretivas de comunicação coletiva envolvem todos os processos de um grupo.
+	- Bcast (Broadcast): Um processo manda a mesma informação para todos os outros.
+	- Gather: Coleta dados de todos os processos. Cada processo tem um trecho diferente do vetor e o Gather os reúne no processo raiz.
+	- Scatter: O inverso do Gather. O processo root manda uma parte diferente do vetor para cada um dos outros processos.
+	- AllGather: Similar ao Gather, mas o resultado final é distribuído para todos os processos envolvidos, não apenas para o root.
+	- All to All: Cada processo envia e recebe dados de todos os outros processos.
 
 4. Sincronização e Operações
-	- Barrier (MPI_Barrier): Todas as instâncias esperam até que todos os processos alcancem este ponto[cite: 17].
-	- Reduction (MPI_Reduce): Coleta dados de todos os processos e aplica uma operação (como soma ou valor máximo), retornando o resultado consolidado[cite: 18].
+	- Barrier (MPI_Barrier): Todas as instâncias esperam até que todos os processos alcancem este ponto.
+	- Reduction (MPI_Reduce): Coleta dados de todos os processos e aplica uma operação (como soma ou valor máximo), retornando o resultado consolidado.
 
 5. Comunicação Não Bloqueante (Assíncrona)
 	Diferente das funções bloqueantes (como MPI_Send e MPI_Recv), que travam a execução até o envio/recebimento terminar, as versões não bloqueantes iniciam a operação e retornam imediatamente.
@@ -37,7 +37,7 @@ MPI
 	- MPI_Request: Objeto gerado por operações não bloqueantes que serve como um identificador para rastrear o status da transação.
 	Controle de Conclusão (Wait e Test):
 		- MPI_Wait: Bloqueia a execução do programa e só libera quando a operação vinculada ao MPI_Request for concluída. Obrigatório antes de ler o buffer de um Irecv ou modificar o de um Isend.
-		- MPI_Test: Apenas checa se a operação foi concluída, retornando verdadeiro ou falso instantaneamente, sem bloquear o fluxo.
+		- MPI_Test: Apenas checa se a operação foi concluída, retornando verdadeiro ou falso instantaneamente, sem bloquear (aparentemente) o fluxo.
 
 6. Inspeção de Mensagens Dinâmicas (MPI_Probe)
 	Permite ao processo "espiar" a fila de mensagens recebidas antes de efetivamente realizar o recebimento dos dados.

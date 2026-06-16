@@ -4,3 +4,5 @@ a.out
 ___presentations/
 .vscode/
 T2_CAD/gb100-2025/
+.last_dir
+cuda/ex.cu
